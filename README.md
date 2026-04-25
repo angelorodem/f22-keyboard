@@ -36,18 +36,13 @@ Columns:
 
 ## Build Targets
 
-GitHub Actions builds normal and debug UF2 files:
+GitHub Actions currently builds these UF2 files:
 
-- `rp2354_split_left_plain`
-- `rp2354_split_left_boot_led`
-- `rp2354_split_left_usb_only`
-- `rp2354_split_left_uart_logging`
-- `rp2354_split_left/rp2350b/m33/zmk`
-- `rp2354_split_right/rp2350b/m33/zmk`
+- `rp2354_split_left_usb_app_focus_ladder`
+- `rp2354_split_left`
+- `rp2354_split_right`
 
 The build matrix is in [build.yaml](build.yaml). The firmware artifact is named `firmware`.
-
-For USB bring-up debugging, GitHub Actions also builds a `rp2354_split_left_usb_logging` UF2 that exposes a USB CDC ACM log port on the left half.
 
 ## Editing The Keymap
 
@@ -78,18 +73,7 @@ ZMK cannot flash the passive half over TRRS/UART. Flash both MCUs manually:
 
 Do not connect or disconnect the split cable while either half is powered.
 
-For first bring-up and USB debugging:
-
-1. Flash `rp2354_split_left_plain.uf2` to the left half.
-2. Leave the right half disconnected for the first USB test.
-3. Plug USB into the left half and check Windows Device Manager for a new keyboard/HID device.
-4. If `rp2354_split_left_plain.uf2` enumerates, the issue is in an added snippet rather than the base board bring-up.
-5. If it does not enumerate, flash `rp2354_split_left_blink.uf2` and watch GPIO31.
-6. A steady repeating blink means the system reached application context with USB disabled, so the remaining problem is on the USB path rather than early boot.
-7. No repeating blink means the failure happens before or during normal kernel bring-up, so debug should stay focused below USB.
-8. Flash `rp2354_split_left_usb_state.uf2` next and plug USB into the left half.
-9. The USB-state image uses GPIO31 as a repeating state code: 1 blink means `usb_enable()` succeeded and is waiting for bus events, 2 blinks means reset seen, 3 blinks means connected, 4 blinks means configured, 5 blinks means disconnected, and solid on means `usb_enable()` failed immediately.
-10. If the left half reaches either the connected or configured pattern, flash the normal left UF2 again, then flash the right UF2 and test the full split.
+For the active USB bring-up probe, flash `rp2354_split_left_usb_app_focus_ladder.uf2` to the left half with the right half disconnected. GPIO31 shows slow pulse groups around APPLICATION init priorities 93 through 98; the last completed group identifies the latest priority reached before boot stalls.
 
 ## Local Build
 

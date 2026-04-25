@@ -1,42 +1,7 @@
 include:
   - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_plain
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_blink
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_blink.overlay -DEXTRA_CONF_FILE=$PWD/config/left_blink.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_hwinfo_blink
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_hwinfo_blink.overlay -DEXTRA_CONF_FILE=$PWD/config/left_hwinfo_blink.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_armed
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_armed.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_armed.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_raw
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_raw.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_raw.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_driver_blink
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_driver_blink.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_driver_blink.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_init_bracket
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_init_bracket.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_init_bracket.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_init_ladder
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_init_ladder.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_init_ladder.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_app_ladder
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_app_ladder.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_app_ladder.conf
-
-  - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_state
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_state.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_state.conf
+    artifact-name: rp2354_split_left_usb_app_focus_ladder
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_app_focus_ladder.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_app_focus_ladder.conf
 
   - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left

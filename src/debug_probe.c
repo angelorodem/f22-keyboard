@@ -215,6 +215,48 @@ F22_LADDER_STEP(app_97, APPLICATION, 97, 8);
 F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
 #endif
 
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_APP_FOCUS_LADDER)
+#define FOCUS_LADDER_LEAD_US 1000000
+#define FOCUS_LADDER_PULSE_US 350000
+#define FOCUS_LADDER_HOLD_US 1200000
+
+static void focus_ladder_pulse(int n)
+{
+    (void)gpio_pin_set_dt(&debug_led, 0);
+    k_busy_wait(FOCUS_LADDER_LEAD_US);
+
+    for (int i = 0; i < n; i++) {
+        (void)gpio_pin_set_dt(&debug_led, 1);
+        k_busy_wait(FOCUS_LADDER_PULSE_US);
+        (void)gpio_pin_set_dt(&debug_led, 0);
+        k_busy_wait(FOCUS_LADDER_PULSE_US);
+    }
+
+    k_busy_wait(FOCUS_LADDER_LEAD_US);
+    (void)gpio_pin_set_dt(&debug_led, 1);
+    k_busy_wait(FOCUS_LADDER_HOLD_US);
+}
+
+#define F22_FOCUS_LADDER_STEP(name, level, prio, count)            \
+    static int f22_focus_ladder_##name(void)                       \
+    {                                                              \
+        int ret = configure_debug_led();                           \
+        if (ret != 0) {                                            \
+            return ret;                                            \
+        }                                                          \
+        focus_ladder_pulse(count);                                 \
+        return 0;                                                  \
+    }                                                              \
+    SYS_INIT(f22_focus_ladder_##name, level, prio)
+
+F22_FOCUS_LADDER_STEP(app_93, APPLICATION, 93, 1);
+F22_FOCUS_LADDER_STEP(app_94, APPLICATION, 94, 2);
+F22_FOCUS_LADDER_STEP(app_95, APPLICATION, 95, 3);
+F22_FOCUS_LADDER_STEP(app_96, APPLICATION, 96, 4);
+F22_FOCUS_LADDER_STEP(app_97, APPLICATION, 97, 5);
+F22_FOCUS_LADDER_STEP(app_98, APPLICATION, 98, 6);
+#endif
+
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
 #define USB_RAW_THREAD_STACK 1024
 #define USB_RAW_THREAD_PRIO 7

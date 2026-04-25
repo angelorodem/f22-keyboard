@@ -40,6 +40,8 @@ GitHub Actions builds normal and debug UF2 files:
 
 - `rp2354_split_left_plain`
 - `rp2354_split_left_boot_led`
+- `rp2354_split_left_usb_only`
+- `rp2354_split_left_uart_logging`
 - `rp2354_split_left/rp2350b/m33/zmk`
 - `rp2354_split_right/rp2350b/m33/zmk`
 
@@ -85,8 +87,11 @@ For first bring-up and USB debugging:
 5. If it does not enumerate, flash `rp2354_split_left_boot_led.uf2` and check whether GPIO31 turns on.
 6. If the boot LED turns on, the firmware is booting far enough to initialize GPIO and the next issue is USB device stack bring-up.
 7. If the boot LED does not turn on, the firmware may not be booting or GPIO31 polarity/wiring may not match the board.
-8. Flash `rp2354_split_left_usb_logging.uf2` and check Windows Device Manager for a new USB serial device.
-9. If the left half enumerates with either USB debug image, flash the normal left UF2 again, then flash the right UF2 and test the full split with the UART cable attached before power-up.
+8. Flash `rp2354_split_left_usb_only.uf2` and check Windows Device Manager for a new keyboard/HID device.
+9. If the USB-only image enumerates, re-enable split features next; if it does not, USB device-stack bring-up is failing independently of split/indicator code.
+10. Flash `rp2354_split_left_usb_logging.uf2` and check Windows Device Manager for a new USB serial device.
+11. If USB still does not enumerate, flash `rp2354_split_left_uart_logging.uf2` and connect a USB-to-serial adapter at 115200 8N1: adapter RX to board GPIO0, adapter TX to board GPIO1, and ground to ground.
+12. If the left half enumerates with either USB debug image, flash the normal left UF2 again, then flash the right UF2 and test the full split with the UART cable attached before power-up.
 
 ## Local Build
 

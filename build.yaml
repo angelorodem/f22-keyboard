@@ -7,6 +7,14 @@ include:
     cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_boot_led.overlay -DEXTRA_CONF_FILE=$PWD/config/left_boot_led.conf
 
   - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_usb_only
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_only.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_only.conf
+
+  - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_uart_logging
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_uart_logging.overlay -DEXTRA_CONF_FILE=$PWD/config/left_uart_logging.conf
+
+  - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left
     snippet: rp2-boot-mode-retention
 

@@ -1,0 +1,24 @@
+menu "F22 debug probes"
+
+config F22_DEBUG_PROBE
+    bool "Enable F22 debug probes"
+    default n
+
+if F22_DEBUG_PROBE
+
+config F22_DEBUG_PROBE_BLINK
+    bool "Blink led0 from application context"
+    depends on GPIO
+    help
+      Toggle the led0 alias from a kernel timer to confirm the system reaches
+      application context without relying on USB bring-up.
+
+config F22_DEBUG_PROBE_USB_STATE
+    bool "Show USB device state on led0"
+    depends on GPIO && USB_DEVICE_STACK
+    help
+      Drive the led0 alias with a repeating blink pattern after usb_enable().
+
+endif
+
+endmenu

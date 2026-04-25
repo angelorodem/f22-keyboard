@@ -84,14 +84,12 @@ For first bring-up and USB debugging:
 2. Leave the right half disconnected for the first USB test.
 3. Plug USB into the left half and check Windows Device Manager for a new keyboard/HID device.
 4. If `rp2354_split_left_plain.uf2` enumerates, the issue is in an added snippet rather than the base board bring-up.
-5. If it does not enumerate, flash `rp2354_split_left_boot_led.uf2` and check whether GPIO31 turns on.
-6. If the boot LED turns on, the firmware is booting far enough to initialize GPIO and the next issue is USB device stack bring-up.
-7. If the boot LED does not turn on, the firmware may not be booting or GPIO31 polarity/wiring may not match the board.
-8. Flash `rp2354_split_left_usb_only.uf2` and check Windows Device Manager for a new keyboard/HID device.
-9. If the USB-only image enumerates, re-enable split features next; if it does not, USB device-stack bring-up is failing independently of split/indicator code.
-10. Flash `rp2354_split_left_usb_logging.uf2` and check Windows Device Manager for a new USB serial device.
-11. If USB still does not enumerate, flash `rp2354_split_left_uart_logging.uf2` and connect a USB-to-serial adapter at 115200 8N1: adapter RX to board GPIO0, adapter TX to board GPIO1, and ground to ground.
-12. If the left half enumerates with either USB debug image, flash the normal left UF2 again, then flash the right UF2 and test the full split with the UART cable attached before power-up.
+5. If it does not enumerate, flash `rp2354_split_left_blink.uf2` and watch GPIO31.
+6. A steady repeating blink means the system reached application context with USB disabled, so the remaining problem is on the USB path rather than early boot.
+7. No repeating blink means the failure happens before or during normal kernel bring-up, so debug should stay focused below USB.
+8. Flash `rp2354_split_left_usb_state.uf2` next and plug USB into the left half.
+9. The USB-state image uses GPIO31 as a repeating state code: 1 blink means `usb_enable()` succeeded and is waiting for bus events, 2 blinks means reset seen, 3 blinks means connected, 4 blinks means configured, 5 blinks means disconnected, and solid on means `usb_enable()` failed immediately.
+10. If the left half reaches either the connected or configured pattern, flash the normal left UF2 again, then flash the right UF2 and test the full split.
 
 ## Local Build
 

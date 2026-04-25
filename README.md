@@ -10,7 +10,7 @@ The build uses current upstream ZMK because RP2350/RP2350B support and Zephyr ha
 - SoC target: `rp2350b/m33`
 - Left half: USB/powered ZMK central
 - Right half: UART split peripheral
-- Status LED: GPIO31
+- Caps Lock LED: GPIO31
 - Wired split UART: TX GPIO0, RX GPIO1, UART0
 - Matrix per half: 5 rows x 8 columns
 - Matrix diode direction: row to column, ZMK `row2col`
@@ -53,6 +53,10 @@ The keymap-editor files are included:
 - [config/info.json](config/info.json)
 
 Use [Nick Coutsos's ZMK keymap editor](https://nickcoutsos.github.io/keymap-editor/) with this repository.
+
+## Caps Lock LED
+
+GPIO31 is configured as a HID Caps Lock indicator. When the host reports Caps Lock as active, the GPIO31 LED turns on. When Caps Lock is inactive, it turns off. HID indicator state is also forwarded to the wired split peripheral, so the right half can mirror the indicator if it has the same LED wiring.
 
 ## Flashing
 

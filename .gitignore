@@ -2,7 +2,8 @@ build/
 firmware/
 modules/
 tools/
-zephyr/
+zephyr/*
+!zephyr/module.yml
 zmk/
 bootloader/
 .west/

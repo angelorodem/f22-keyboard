@@ -8,7 +8,7 @@
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE) || \
     defined(CONFIG_F22_DEBUG_PROBE_USB_ARMED) || \
     defined(CONFIG_F22_DEBUG_PROBE_USB_RAW) || \
-    defined(CONFIG_F22_DEBUG_PROBE_USB_ATTACH_GATE)
+    defined(CONFIG_F22_DEBUG_PROBE_USB_ENABLE_GATE)
 #define F22_DEBUG_PROBE_HAS_USB 1
 #endif
 
@@ -216,35 +216,44 @@ F22_LADDER_STEP(app_97, APPLICATION, 97, 8);
 F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
 #endif
 
-#if defined(CONFIG_F22_DEBUG_PROBE_USB_ATTACH_GATE)
-#define ATTACH_GATE_LEAD_US 1000000
-#define ATTACH_GATE_PULSE_US 350000
-#define ATTACH_GATE_HOLD_US 1200000
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_ENABLE_GATE)
+#define ENABLE_GATE_LEAD_MS 1000
+#define ENABLE_GATE_PULSE_MS 350
+#define ENABLE_GATE_HOLD_MS 1200
 
-static void attach_gate_pulse(int n)
+extern void usb_status_cb(enum usb_dc_status_code status, const uint8_t *params);
+
+static void enable_gate_pulse(int n)
 {
     (void)gpio_pin_set_dt(&debug_led, 0);
-    k_busy_wait(ATTACH_GATE_LEAD_US);
+    k_msleep(ENABLE_GATE_LEAD_MS);
 
     for (int i = 0; i < n; i++) {
         (void)gpio_pin_set_dt(&debug_led, 1);
-        k_busy_wait(ATTACH_GATE_PULSE_US);
+        k_msleep(ENABLE_GATE_PULSE_MS);
         (void)gpio_pin_set_dt(&debug_led, 0);
-        k_busy_wait(ATTACH_GATE_PULSE_US);
+        k_msleep(ENABLE_GATE_PULSE_MS);
     }
 
-    k_busy_wait(ATTACH_GATE_LEAD_US);
+    k_msleep(ENABLE_GATE_LEAD_MS);
     (void)gpio_pin_set_dt(&debug_led, 1);
-    k_busy_wait(ATTACH_GATE_HOLD_US);
+    k_msleep(ENABLE_GATE_HOLD_MS);
 }
 
-static void attach_gate_status_cb(enum usb_dc_status_code status, const uint8_t *params)
+static int f22_debug_probe_usb_enable_gate_before_hid(void)
 {
-    ARG_UNUSED(status);
-    ARG_UNUSED(params);
+    int ret;
+
+    ret = configure_debug_led();
+    if (ret != 0) {
+        return ret;
+    }
+
+    enable_gate_pulse(1);
+    return 0;
 }
 
-static int f22_debug_probe_usb_attach_gate(void)
+static int f22_debug_probe_usb_enable_gate(void)
 {
     unsigned int key;
     int ret;
@@ -254,25 +263,25 @@ static int f22_debug_probe_usb_attach_gate(void)
         return ret;
     }
 
-    attach_gate_pulse(1);
-    usb_dc_set_status_callback(attach_gate_status_cb);
-
+    enable_gate_pulse(2);
     key = irq_lock();
-    ret = usb_dc_attach();
-    if (ret < 0) {
-        attach_gate_pulse(2);
-        irq_unlock(key);
+    ret = usb_enable(usb_status_cb);
+    irq_unlock(key);
+
+    if (ret != 0) {
+        enable_gate_pulse(3);
         return ret;
     }
 
-    attach_gate_pulse(3);
-    irq_unlock(key);
-    attach_gate_pulse(4);
+    enable_gate_pulse(4);
+    k_msleep(2000);
+    enable_gate_pulse(5);
 
     return 0;
 }
 
-SYS_INIT(f22_debug_probe_usb_attach_gate, APPLICATION, 98);
+SYS_INIT(f22_debug_probe_usb_enable_gate_before_hid, APPLICATION, 94);
+SYS_INIT(f22_debug_probe_usb_enable_gate, APPLICATION, 98);
 #endif
 
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
@@ -341,4 +350,6 @@ static int f22_debug_probe_init(void)
     return 0;
 }
 
+#if !defined(CONFIG_F22_DEBUG_PROBE_USB_ENABLE_GATE)
 SYS_INIT(f22_debug_probe_init, APPLICATION, 99);
+#endif

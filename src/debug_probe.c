@@ -5,7 +5,13 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
 
-#if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE)
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE) || \
+    defined(CONFIG_F22_DEBUG_PROBE_USB_ARMED) || \
+    defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
+#define F22_DEBUG_PROBE_HAS_USB 1
+#endif
+
+#if defined(F22_DEBUG_PROBE_HAS_USB)
 #include <zephyr/drivers/usb/usb_dc.h>
 #include <zephyr/usb/usb_device.h>
 #endif
@@ -41,15 +47,17 @@ static void blink_timer_handler(struct k_timer *timer)
 K_TIMER_DEFINE(blink_timer, blink_timer_handler, NULL);
 #endif
 
-#if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE)
+#if defined(F22_DEBUG_PROBE_HAS_USB)
 enum usb_probe_pattern {
     USB_PROBE_PATTERN_OFF = 0,
     USB_PROBE_PATTERN_ARMED = 1,
-    USB_PROBE_PATTERN_RESET = 2,
-    USB_PROBE_PATTERN_CONNECTED = 3,
-    USB_PROBE_PATTERN_CONFIGURED = 4,
-    USB_PROBE_PATTERN_DISCONNECTED = 5,
-    USB_PROBE_PATTERN_SUSPENDED = 6,
+    USB_PROBE_PATTERN_BEFORE_ENABLE = 2,
+    USB_PROBE_PATTERN_AFTER_ENABLE = 3,
+    USB_PROBE_PATTERN_RESET = 4,
+    USB_PROBE_PATTERN_CONNECTED = 5,
+    USB_PROBE_PATTERN_CONFIGURED = 6,
+    USB_PROBE_PATTERN_DISCONNECTED = 7,
+    USB_PROBE_PATTERN_SUSPENDED = 8,
 };
 
 static atomic_t usb_pattern_count;
@@ -121,6 +129,36 @@ static void usb_status_cb(enum usb_dc_status_code status, const uint8_t *param)
 K_TIMER_DEFINE(usb_state_timer, usb_state_timer_handler, NULL);
 #endif
 
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
+#define USB_RAW_THREAD_STACK 1024
+#define USB_RAW_THREAD_PRIO 7
+
+static K_THREAD_STACK_DEFINE(usb_raw_stack, USB_RAW_THREAD_STACK);
+static struct k_thread usb_raw_thread_data;
+
+static void usb_raw_thread(void *p1, void *p2, void *p3)
+{
+    int ret;
+
+    ARG_UNUSED(p1);
+    ARG_UNUSED(p2);
+    ARG_UNUSED(p3);
+
+    set_usb_pattern(USB_PROBE_PATTERN_ARMED);
+    k_msleep(3000);
+    set_usb_pattern(USB_PROBE_PATTERN_BEFORE_ENABLE);
+    k_msleep(1500);
+
+    ret = usb_enable(usb_status_cb);
+    if (ret != 0) {
+        atomic_set(&usb_enable_failed, 1);
+        return;
+    }
+
+    set_usb_pattern(USB_PROBE_PATTERN_AFTER_ENABLE);
+}
+#endif
+
 static int f22_debug_probe_init(void)
 {
     int ret;
@@ -134,15 +172,24 @@ static int f22_debug_probe_init(void)
     k_timer_start(&blink_timer, K_NO_WAIT, K_MSEC(250));
 #endif
 
-#if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE)
+#if defined(F22_DEBUG_PROBE_HAS_USB)
     set_usb_pattern(USB_PROBE_PATTERN_ARMED);
     k_timer_start(&usb_state_timer, K_NO_WAIT, K_MSEC(150));
+#endif
 
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE)
     ret = usb_enable(usb_status_cb);
     if (ret != 0) {
         atomic_set(&usb_enable_failed, 1);
         (void)gpio_pin_set_dt(&debug_led, 1);
     }
+#endif
+
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
+    (void)k_thread_create(&usb_raw_thread_data, usb_raw_stack,
+                          K_THREAD_STACK_SIZEOF(usb_raw_stack),
+                          usb_raw_thread, NULL, NULL, NULL,
+                          USB_RAW_THREAD_PRIO, 0, K_NO_WAIT);
 #endif
 
     return 0;

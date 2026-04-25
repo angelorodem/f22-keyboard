@@ -19,6 +19,22 @@ config F22_DEBUG_PROBE_USB_STATE
     help
       Drive the led0 alias with a repeating blink pattern after usb_enable().
 
+config F22_DEBUG_PROBE_USB_ARMED
+    bool "Link USB stack but never call usb_enable"
+    depends on GPIO && USB_DEVICE_STACK
+    help
+      Pulls in the Zephyr USB device stack and the RP2350 USB driver so they
+      are linked and statically initialized, but does not call usb_enable.
+      Used to check whether merely linking USB code is enough to crash boot.
+
+config F22_DEBUG_PROBE_USB_RAW
+    bool "Call usb_enable from a thread after blinking"
+    depends on GPIO && USB_DEVICE_STACK
+    help
+      Run from a kernel thread (not SYS_INIT) so the LED is guaranteed to
+      blink before usb_enable is called. Useful to localize whether
+      usb_enable itself faults.
+
 endif
 
 endmenu

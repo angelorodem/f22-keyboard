@@ -5,9 +5,11 @@ boards:
       - name: rp2350b
         variants:
           - name: zmk
+            cpucluster: m33
   - name: rp2354_split_right
     vendor: custom
     socs:
       - name: rp2350b
         variants:
           - name: zmk
+            cpucluster: m33

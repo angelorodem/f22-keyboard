@@ -32,7 +32,7 @@
         compatible = "gpio-leds";
 
         led0: caps_lock_led: led_0 {
-            gpios = <&gpio0_hi 1 GPIO_ACTIVE_HIGH>;
+            gpios = <&gpio0 31 GPIO_ACTIVE_HIGH>;
             label = "Caps Lock";
         };
     };
@@ -94,10 +94,6 @@
 };
 
 &gpio0 {
-    status = "okay";
-};
-
-&gpio0_hi {
     status = "okay";
 };
 

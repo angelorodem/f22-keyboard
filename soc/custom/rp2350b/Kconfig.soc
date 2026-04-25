@@ -1,0 +1,28 @@
+# RP2350B SoC Kconfig (Zephyr v4.1 compatibility shim)
+# SPDX-License-Identifier: Apache-2.0
+
+config SOC_FAMILY_RPI_PICO
+	bool
+
+config SOC_FAMILY
+	default "rpi_pico" if SOC_FAMILY_RPI_PICO
+
+config SOC_SERIES_RP2350
+	bool
+	select SOC_FAMILY_RPI_PICO
+
+config SOC_SERIES
+	default "rp2350" if SOC_SERIES_RP2350
+
+config SOC_RP2350B
+	bool
+	select SOC_SERIES_RP2350
+
+config SOC_RP2350B_M33
+	bool
+	select SOC_RP2350B
+	help
+	  Use the RP2350B with a Cortex-M33 core in both 'sockets'.
+
+config SOC
+	default "rp2350b" if SOC_RP2350B

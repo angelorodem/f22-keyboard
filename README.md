@@ -2,7 +2,7 @@
 
 This repository is a ZMK user-config repository and Zephyr board module for a wired split keyboard using an RP2354B on each half.
 
-The build uses current upstream ZMK because RP2350/RP2350B support and Zephyr hardware model v2 board variants are needed for the targets below.
+The build uses current upstream ZMK and includes a small RP2350B compatibility shim for the Zephyr 4.1 hardware model used by ZMK.
 
 ## Hardware Assumptions
 
@@ -77,6 +77,6 @@ Do not connect or disconnect the split cable while either half is powered.
 After setting up a ZMK west workspace, build from the workspace root with:
 
 ```sh
-west build -s zmk/app -d build/left -b rp2354_split_left/rp2350b/m33/zmk -S rp2-boot-mode-retention -- -DZMK_CONFIG="$PWD/config"
-west build -s zmk/app -d build/right -b rp2354_split_right/rp2350b/m33/zmk -S rp2-boot-mode-retention -- -DZMK_CONFIG="$PWD/config"
+west build -s zmk/app -d build/left -b rp2354_split_left/rp2350b/m33/zmk -S rp2-boot-mode-retention -- -DZMK_CONFIG="$PWD/config" -DZMK_EXTRA_MODULES="$PWD"
+west build -s zmk/app -d build/right -b rp2354_split_right/rp2350b/m33/zmk -S rp2-boot-mode-retention -- -DZMK_CONFIG="$PWD/config" -DZMK_EXTRA_MODULES="$PWD"
 ```

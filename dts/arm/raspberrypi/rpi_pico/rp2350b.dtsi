@@ -1,0 +1,15 @@
+/*
+ * RP2350B device tree (Zephyr v4.1 compatibility shim).
+ *
+ * Zephyr v4.1 models the Pico GPIO controller as a single `gpio0` node
+ * (compatible "raspberrypi,pico-gpio") covering all GPIOs. The RP2350B
+ * QFN-80 package exposes 48 GPIOs (GP0..GP47).
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <raspberrypi/rpi_pico/rp2350.dtsi>
+
+&gpio0 {
+	ngpios = <48>;
+};

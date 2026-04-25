@@ -1,0 +1,8 @@
+family:
+  - name: rpi_pico
+    series:
+      - name: rp2350
+        socs:
+          - name: rp2350b
+            cpuclusters:
+              - name: m33

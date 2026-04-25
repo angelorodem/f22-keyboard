@@ -1,5 +1,8 @@
 include:
   - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_plain
+
+  - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left
     snippet: rp2-boot-mode-retention
 

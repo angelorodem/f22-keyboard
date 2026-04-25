@@ -38,6 +38,7 @@ Columns:
 
 GitHub Actions builds both UF2 files:
 
+- `rp2354_split_left_plain`
 - `rp2354_split_left/rp2350b/m33/zmk`
 - `rp2354_split_right/rp2350b/m33/zmk`
 
@@ -76,10 +77,12 @@ Do not connect or disconnect the split cable while either half is powered.
 
 For first bring-up and USB debugging:
 
-1. Flash `rp2354_split_left_usb_logging.uf2` to the left half.
+1. Flash `rp2354_split_left_plain.uf2` to the left half.
 2. Leave the right half disconnected for the first USB test.
-3. Plug USB into the left half and check Windows Device Manager for either a new keyboard/HID device or a new USB serial device.
-4. If the left half enumerates, flash the normal left UF2 again, then flash the right UF2 and test the full split with the UART cable attached before power-up.
+3. Plug USB into the left half and check Windows Device Manager for a new keyboard/HID device.
+4. If `rp2354_split_left_plain.uf2` enumerates, the issue is in an added snippet rather than the base board bring-up.
+5. If it does not enumerate, flash `rp2354_split_left_usb_logging.uf2` and check Windows Device Manager for a new USB serial device.
+6. If the left half enumerates with either debug image, flash the normal left UF2 again, then flash the right UF2 and test the full split with the UART cable attached before power-up.
 
 ## Local Build
 

@@ -255,7 +255,6 @@ static int f22_debug_probe_usb_enable_gate_before_hid(void)
 
 static int f22_debug_probe_usb_enable_gate(void)
 {
-    unsigned int key;
     int ret;
 
     ret = configure_debug_led();
@@ -264,9 +263,12 @@ static int f22_debug_probe_usb_enable_gate(void)
     }
 
     enable_gate_pulse(2);
-    key = irq_lock();
+
+    /* Call usb_enable() in normal context. It internally takes a mutex with
+     * K_FOREVER, so it MUST NOT be called with IRQs locked or the scheduler
+     * cannot resume the thread on contention.
+     */
     ret = usb_enable(usb_status_cb);
-    irq_unlock(key);
 
     if (ret != 0) {
         enable_gate_pulse(3);

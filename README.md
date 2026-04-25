@@ -73,7 +73,7 @@ ZMK cannot flash the passive half over TRRS/UART. Flash both MCUs manually:
 
 Do not connect or disconnect the split cable while either half is powered.
 
-For the active USB bring-up probe, flash `rp2354_split_left_usb_enable_gate.uf2` to the left half with the right half disconnected. GPIO31 shows one pulse before ZMK's HID setup, then walks the early `usb_enable()` path with numbered pulse groups: two before descriptor discovery, three before descriptor registration, four before status callback registration, five before `usb_dc_attach()`, six before USB transfer setup, seven before EP0 OUT configure, eight before EP0 IN configure, nine before EP0 callback install, ten before EP0 enable, and eleven after those public steps complete. This probe disables the RP Pico HWINFO flash-ID serial-number driver to test whether descriptor discovery was freezing in `flash_get_unique_id()`. If a step returns an error, its marker repeats. If a step hangs, the LED stays solid after the last marker you counted.
+For the active USB bring-up probe, flash `rp2354_split_left_usb_enable_gate.uf2` to the left half with the right half disconnected. GPIO31 shows one pulse before ZMK's HID setup, two pulses immediately before ZMK's real `usb_enable()` call, and three pulses after `usb_enable()` returns. After that, a fast three-pulse pattern means the probe reached the post-enable idle loop. The firmware overrides Zephyr's weak USB serial-number updater so descriptor setup keeps the configured `CONFIG_USB_DEVICE_SN` and avoids the RP Pico `flash_get_unique_id()` path during USB bring-up.
 
 ## Local Build
 

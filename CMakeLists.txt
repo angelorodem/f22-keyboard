@@ -1,2 +1,3 @@
 zephyr_library()
+zephyr_library_sources_ifdef(CONFIG_USB_DEVICE_STACK src/usb_serial_number.c)
 zephyr_library_sources_ifdef(CONFIG_F22_DEBUG_PROBE src/debug_probe.c)

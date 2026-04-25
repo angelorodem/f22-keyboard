@@ -35,6 +35,14 @@ config F22_DEBUG_PROBE_USB_RAW
       blink before usb_enable is called. Useful to localize whether
       usb_enable itself faults.
 
+config F22_DEBUG_PROBE_USB_INIT_BRACKET
+    bool "Bracket USB controller init priority with led0"
+    depends on GPIO && USB_DEVICE_STACK
+    help
+      Drives led0 off just before the default device init priority and on just
+      after it. Used with a GPIO hog and application blink probe to determine
+      whether boot stops inside the RP Pico USB controller init.
+
 endif
 
 endmenu

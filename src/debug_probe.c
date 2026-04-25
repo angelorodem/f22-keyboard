@@ -129,6 +129,35 @@ static void usb_status_cb(enum usb_dc_status_code status, const uint8_t *param)
 K_TIMER_DEFINE(usb_state_timer, usb_state_timer_handler, NULL);
 #endif
 
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_INIT_BRACKET)
+static int f22_debug_probe_pre_usb_init(void)
+{
+    int ret;
+
+    ret = configure_debug_led();
+    if (ret != 0) {
+        return ret;
+    }
+
+    return gpio_pin_set_dt(&debug_led, 0);
+}
+
+static int f22_debug_probe_post_usb_init(void)
+{
+    int ret;
+
+    ret = configure_debug_led();
+    if (ret != 0) {
+        return ret;
+    }
+
+    return gpio_pin_set_dt(&debug_led, 1);
+}
+
+SYS_INIT(f22_debug_probe_pre_usb_init, POST_KERNEL, 49);
+SYS_INIT(f22_debug_probe_post_usb_init, POST_KERNEL, 51);
+#endif
+
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
 #define USB_RAW_THREAD_STACK 1024
 #define USB_RAW_THREAD_PRIO 7

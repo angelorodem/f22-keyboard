@@ -7,6 +7,10 @@ include:
     cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_blink.overlay -DEXTRA_CONF_FILE=$PWD/config/left_blink.conf
 
   - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_hwinfo_blink
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_hwinfo_blink.overlay -DEXTRA_CONF_FILE=$PWD/config/left_hwinfo_blink.conf
+
+  - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left_usb_armed
     cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_armed.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_armed.conf
 
@@ -17,6 +21,10 @@ include:
   - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left_usb_driver_blink
     cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_driver_blink.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_driver_blink.conf
+
+  - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_usb_init_bracket
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_init_bracket.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_init_bracket.conf
 
   - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left_usb_state

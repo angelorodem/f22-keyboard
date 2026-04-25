@@ -7,7 +7,8 @@
 
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_STATE) || \
     defined(CONFIG_F22_DEBUG_PROBE_USB_ARMED) || \
-    defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
+    defined(CONFIG_F22_DEBUG_PROBE_USB_RAW) || \
+    defined(CONFIG_F22_DEBUG_PROBE_USB_ATTACH_GATE)
 #define F22_DEBUG_PROBE_HAS_USB 1
 #endif
 
@@ -215,45 +216,63 @@ F22_LADDER_STEP(app_97, APPLICATION, 97, 8);
 F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
 #endif
 
-#if defined(CONFIG_F22_DEBUG_PROBE_USB_APP_FOCUS_LADDER)
-#define FOCUS_LADDER_LEAD_US 1000000
-#define FOCUS_LADDER_PULSE_US 350000
-#define FOCUS_LADDER_HOLD_US 1200000
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_ATTACH_GATE)
+#define ATTACH_GATE_LEAD_US 1000000
+#define ATTACH_GATE_PULSE_US 350000
+#define ATTACH_GATE_HOLD_US 1200000
 
-static void focus_ladder_pulse(int n)
+static void attach_gate_pulse(int n)
 {
     (void)gpio_pin_set_dt(&debug_led, 0);
-    k_busy_wait(FOCUS_LADDER_LEAD_US);
+    k_busy_wait(ATTACH_GATE_LEAD_US);
 
     for (int i = 0; i < n; i++) {
         (void)gpio_pin_set_dt(&debug_led, 1);
-        k_busy_wait(FOCUS_LADDER_PULSE_US);
+        k_busy_wait(ATTACH_GATE_PULSE_US);
         (void)gpio_pin_set_dt(&debug_led, 0);
-        k_busy_wait(FOCUS_LADDER_PULSE_US);
+        k_busy_wait(ATTACH_GATE_PULSE_US);
     }
 
-    k_busy_wait(FOCUS_LADDER_LEAD_US);
+    k_busy_wait(ATTACH_GATE_LEAD_US);
     (void)gpio_pin_set_dt(&debug_led, 1);
-    k_busy_wait(FOCUS_LADDER_HOLD_US);
+    k_busy_wait(ATTACH_GATE_HOLD_US);
 }
 
-#define F22_FOCUS_LADDER_STEP(name, level, prio, count)            \
-    static int f22_focus_ladder_##name(void)                       \
-    {                                                              \
-        int ret = configure_debug_led();                           \
-        if (ret != 0) {                                            \
-            return ret;                                            \
-        }                                                          \
-        focus_ladder_pulse(count);                                 \
-        return 0;                                                  \
-    }                                                              \
-    SYS_INIT(f22_focus_ladder_##name, level, prio)
+static void attach_gate_status_cb(enum usb_dc_status_code status, const uint8_t *params)
+{
+    ARG_UNUSED(status);
+    ARG_UNUSED(params);
+}
 
-F22_FOCUS_LADDER_STEP(app_93, APPLICATION, 93, 1);
-F22_FOCUS_LADDER_STEP(app_94, APPLICATION, 94, 2);
-F22_FOCUS_LADDER_STEP(app_95, APPLICATION, 95, 3);
-F22_FOCUS_LADDER_STEP(app_96, APPLICATION, 96, 4);
-F22_FOCUS_LADDER_STEP(app_97, APPLICATION, 97, 5);
+static int f22_debug_probe_usb_attach_gate(void)
+{
+    unsigned int key;
+    int ret;
+
+    ret = configure_debug_led();
+    if (ret != 0) {
+        return ret;
+    }
+
+    attach_gate_pulse(1);
+    usb_dc_set_status_callback(attach_gate_status_cb);
+
+    key = irq_lock();
+    ret = usb_dc_attach();
+    if (ret < 0) {
+        attach_gate_pulse(2);
+        irq_unlock(key);
+        return ret;
+    }
+
+    attach_gate_pulse(3);
+    irq_unlock(key);
+    attach_gate_pulse(4);
+
+    return 0;
+}
+
+SYS_INIT(f22_debug_probe_usb_attach_gate, APPLICATION, 98);
 #endif
 
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)

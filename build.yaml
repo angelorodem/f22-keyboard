@@ -1,7 +1,7 @@
 include:
   - board: rp2354_split_left/rp2350b/m33/zmk
-    artifact-name: rp2354_split_left_usb_app_focus_ladder
-    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_app_focus_ladder.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_app_focus_ladder.conf
+    artifact-name: rp2354_split_left_usb_attach_gate
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_attach_gate.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_attach_gate.conf
 
   - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left

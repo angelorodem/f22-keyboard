@@ -38,7 +38,7 @@ Columns:
 
 GitHub Actions currently builds these UF2 files:
 
-- `rp2354_split_left_usb_app_focus_ladder`
+- `rp2354_split_left_usb_attach_gate`
 - `rp2354_split_left`
 - `rp2354_split_right`
 
@@ -73,7 +73,7 @@ ZMK cannot flash the passive half over TRRS/UART. Flash both MCUs manually:
 
 Do not connect or disconnect the split cable while either half is powered.
 
-For the active USB bring-up probe, flash `rp2354_split_left_usb_app_focus_ladder.uf2` to the left half with the right half disconnected. GPIO31 shows slow pulse groups around APPLICATION init priorities 93 through 97, while ZMK's USB init is deferred to priority 98. If the board now reaches five pulses and then stalls, the failure follows `zmk_usb_init()`/`usb_enable()`.
+For the active USB bring-up probe, flash `rp2354_split_left_usb_attach_gate.uf2` to the left half with the right half disconnected. GPIO31 first shows one pulse, then the firmware calls `usb_dc_attach()` with CPU interrupts locked. Three pulses means attach returned before USB IRQs were allowed to run. Four pulses means the system also survived after USB IRQs were unlocked.
 
 ## Local Build
 

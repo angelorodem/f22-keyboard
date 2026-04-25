@@ -44,6 +44,10 @@ GitHub Actions currently builds these UF2 files:
 
 The build matrix is in [build.yaml](build.yaml). The firmware artifact is named `firmware`.
 
+The normal left/right builds use a fixed USB serial string and override Zephyr's weak USB
+serial-number updater so RP Pico flash unique-ID reads are not performed during USB descriptor
+setup. They currently use boot-compatible HKRO reports for first-pass Windows validation.
+
 ## Editing The Keymap
 
 The default keymap is in [config/rp2354_split.keymap](config/rp2354_split.keymap). It keeps the Advantage 360 logical layout and layer structure, with Kinesis-specific RGB, BLE, backlight, battery, and Studio bindings replaced by inert bindings for a plain RP2354 wired split build.

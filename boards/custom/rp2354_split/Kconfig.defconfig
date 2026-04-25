@@ -1,0 +1,29 @@
+if BOARD_RP2354_SPLIT_LEFT
+
+config ZMK_KEYBOARD_NAME
+    default "F22 Split"
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
+endif
+
+if BOARD_RP2354_SPLIT_RIGHT
+
+config ZMK_KEYBOARD_NAME
+    default "F22 Split RT"
+
+endif
+
+if BOARD_RP2354_SPLIT_LEFT || BOARD_RP2354_SPLIT_RIGHT
+
+config BOARD
+    default "rp2354_split"
+
+config ZMK_SPLIT
+    default y
+
+config ZMK_SPLIT_WIRED
+    default y
+
+endif

@@ -1,0 +1,12 @@
+file_format: "1"
+id: rp2354_split
+name: F22 RP2354 Split
+type: board
+arch: arm
+features:
+  - keys
+outputs:
+  - usb
+siblings:
+  - rp2354_split_left/rp2350b/m33/zmk
+  - rp2354_split_right/rp2350b/m33/zmk

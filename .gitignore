@@ -1,0 +1,14 @@
+build/
+firmware/
+modules/
+tools/
+zephyr/
+zmk/
+bootloader/
+.west/
+*.uf2
+*.bin
+*.hex
+*.elf
+*.map
+*.log

@@ -73,7 +73,7 @@ ZMK cannot flash the passive half over TRRS/UART. Flash both MCUs manually:
 
 Do not connect or disconnect the split cable while either half is powered.
 
-For the active USB bring-up probe, flash `rp2354_split_left_usb_enable_gate.uf2` to the left half with the right half disconnected. GPIO31 shows one pulse before ZMK's HID setup, then two pulses before the probe calls `usb_enable()` with CPU interrupts locked. Three pulses means `usb_enable()` returned an error, four pulses means `usb_enable()` returned and interrupts were unlocked, and five pulses means the system stayed alive after the first USB interrupt window.
+For the active USB bring-up probe, flash `rp2354_split_left_usb_enable_gate.uf2` to the left half with the right half disconnected. GPIO31 shows one pulse before ZMK's HID setup, then walks the early `usb_enable()` path with numbered pulse groups: two before descriptor setup, three before status callback registration, four before `usb_dc_attach()`, five before USB transfer setup, six before EP0 OUT configure, seven before EP0 IN configure, eight before EP0 callback install, nine before EP0 enable, and ten after those public steps complete. If a step returns an error, its marker repeats. If a step hangs, the LED stays solid after the last marker you counted.
 
 ## Local Build
 

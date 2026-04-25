@@ -61,12 +61,12 @@ config F22_DEBUG_PROBE_USB_APP_LADDER
       reaches APPLICATION priority 50 but stalls before late application init.
 
 config F22_DEBUG_PROBE_USB_ENABLE_GATE
-    bool "Gate full USB enable with led0"
+    bool "Ladder through early USB enable with led0"
     depends on GPIO && USB_DEVICE_STACK
     help
-      Calls usb_enable() with CPU interrupts locked, then unlocks interrupts
-      immediately after it returns. Used after controller attach succeeds to
-      distinguish a hang inside usb_enable from early USB interrupt behavior.
+      Replays the public, early steps of usb_enable() with a numbered LED
+      pulse before each step. Used after controller attach succeeds to find
+      which part of USB stack enable hangs before EP0 starts handling traffic.
 
 endif
 

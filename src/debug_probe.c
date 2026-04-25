@@ -221,14 +221,15 @@ F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
 #define ENABLE_GATE_PULSE_MS 350
 #define ENABLE_GATE_HOLD_MS 1200
 
-extern void usb_status_cb(enum usb_dc_status_code status, const uint8_t *params);
+extern uint8_t *usb_get_device_descriptor(void);
+extern int usb_transfer_init(void);
 
-static void enable_gate_pulse(int n)
+static void enable_gate_pulse(int count)
 {
     (void)gpio_pin_set_dt(&debug_led, 0);
     k_msleep(ENABLE_GATE_LEAD_MS);
 
-    for (int i = 0; i < n; i++) {
+    for (int pulse_index = 0; pulse_index < count; pulse_index++) {
         (void)gpio_pin_set_dt(&debug_led, 1);
         k_msleep(ENABLE_GATE_PULSE_MS);
         (void)gpio_pin_set_dt(&debug_led, 0);
@@ -238,6 +239,20 @@ static void enable_gate_pulse(int n)
     k_msleep(ENABLE_GATE_LEAD_MS);
     (void)gpio_pin_set_dt(&debug_led, 1);
     k_msleep(ENABLE_GATE_HOLD_MS);
+}
+
+static void enable_gate_halt(int marker)
+{
+    while (true) {
+        enable_gate_pulse(marker);
+        k_msleep(2500);
+    }
+}
+
+static void enable_gate_ep_cb(uint8_t endpoint, enum usb_dc_ep_cb_status_code status)
+{
+    ARG_UNUSED(endpoint);
+    ARG_UNUSED(status);
 }
 
 static int f22_debug_probe_usb_enable_gate_before_hid(void)
@@ -255,6 +270,8 @@ static int f22_debug_probe_usb_enable_gate_before_hid(void)
 
 static int f22_debug_probe_usb_enable_gate(void)
 {
+    struct usb_dc_ep_cfg_data ep0_cfg;
+    struct usb_device_descriptor *dev_desc;
     int ret;
 
     ret = configure_debug_led();
@@ -264,20 +281,74 @@ static int f22_debug_probe_usb_enable_gate(void)
 
     enable_gate_pulse(2);
 
-    /* Call usb_enable() in normal context. It internally takes a mutex with
-     * K_FOREVER, so it MUST NOT be called with IRQs locked or the scheduler
-     * cannot resume the thread on contention.
-     */
-    ret = usb_enable(usb_status_cb);
-
-    if (ret != 0) {
-        enable_gate_pulse(3);
-        return ret;
+    ret = usb_set_config(usb_get_device_descriptor());
+    if (ret < 0) {
+        enable_gate_halt(2);
     }
 
+    enable_gate_pulse(3);
+    usb_dc_set_status_callback(usb_status_cb);
+
     enable_gate_pulse(4);
-    k_msleep(2000);
+    ret = usb_dc_attach();
+    if (ret < 0) {
+        enable_gate_halt(4);
+    }
+
     enable_gate_pulse(5);
+    ret = usb_transfer_init();
+    if (ret < 0) {
+        enable_gate_halt(5);
+    }
+
+    enable_gate_pulse(6);
+    dev_desc = (void *)usb_get_device_descriptor();
+    if (dev_desc->bDescriptorType != USB_DESC_DEVICE || dev_desc->bMaxPacketSize0 == 0) {
+        enable_gate_halt(6);
+    }
+
+    ep0_cfg.ep_mps = dev_desc->bMaxPacketSize0;
+    ep0_cfg.ep_type = USB_DC_EP_CONTROL;
+    ep0_cfg.ep_addr = USB_CONTROL_EP_OUT;
+    ret = usb_dc_ep_configure(&ep0_cfg);
+    if (ret < 0) {
+        enable_gate_halt(6);
+    }
+
+    enable_gate_pulse(7);
+    ep0_cfg.ep_addr = USB_CONTROL_EP_IN;
+    ret = usb_dc_ep_configure(&ep0_cfg);
+    if (ret < 0) {
+        enable_gate_halt(7);
+    }
+
+    enable_gate_pulse(8);
+    ret = usb_dc_ep_set_callback(USB_CONTROL_EP_OUT, enable_gate_ep_cb);
+    if (ret < 0) {
+        enable_gate_halt(8);
+    }
+    ret = usb_dc_ep_set_callback(USB_CONTROL_EP_IN, enable_gate_ep_cb);
+    if (ret < 0) {
+        enable_gate_halt(8);
+    }
+
+    enable_gate_pulse(9);
+    ret = usb_dc_ep_enable(USB_CONTROL_EP_OUT);
+    if (ret < 0) {
+        enable_gate_halt(9);
+    }
+    ret = usb_dc_ep_enable(USB_CONTROL_EP_IN);
+    if (ret < 0) {
+        enable_gate_halt(9);
+    }
+
+    enable_gate_pulse(10);
+    set_usb_pattern(USB_PROBE_PATTERN_AFTER_ENABLE);
+    k_timer_start(&usb_state_timer, K_NO_WAIT, K_MSEC(150));
+
+    while (true) {
+        k_msleep(1000);
+    }
 
     return 0;
 }

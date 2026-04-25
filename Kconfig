@@ -61,11 +61,11 @@ config F22_DEBUG_PROBE_USB_APP_LADDER
       reaches APPLICATION priority 50 but stalls before late application init.
 
 config F22_DEBUG_PROBE_USB_APP_FOCUS_LADDER
-    bool "Slow led0 pulse ladder around application priorities 93-98"
+    bool "Slow led0 pulse ladder around application priorities 93-97"
     depends on GPIO && USB_DEVICE_STACK
     help
       Registers slower, easier-to-count SYS_INIT hooks around APPLICATION
-      priorities 93 through 98. Each group starts and ends with a long low
+      priorities 93 through 97. Each group starts and ends with a long low
       interval so the visible pulse count is easier to identify by eye.
 
 endif

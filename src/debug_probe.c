@@ -271,6 +271,7 @@ static int f22_debug_probe_usb_enable_gate_before_hid(void)
 static int f22_debug_probe_usb_enable_gate(void)
 {
     struct usb_dc_ep_cfg_data ep0_cfg;
+    uint8_t *device_descriptor;
     struct usb_device_descriptor *dev_desc;
     int ret;
 
@@ -281,30 +282,36 @@ static int f22_debug_probe_usb_enable_gate(void)
 
     enable_gate_pulse(2);
 
-    ret = usb_set_config(usb_get_device_descriptor());
-    if (ret < 0) {
+    device_descriptor = usb_get_device_descriptor();
+    if (device_descriptor == NULL) {
         enable_gate_halt(2);
     }
 
     enable_gate_pulse(3);
-    usb_dc_set_status_callback(usb_status_cb);
-
-    enable_gate_pulse(4);
-    ret = usb_dc_attach();
+    ret = usb_set_config(device_descriptor);
     if (ret < 0) {
-        enable_gate_halt(4);
+        enable_gate_halt(3);
     }
 
+    enable_gate_pulse(4);
+    usb_dc_set_status_callback(usb_status_cb);
+
     enable_gate_pulse(5);
-    ret = usb_transfer_init();
+    ret = usb_dc_attach();
     if (ret < 0) {
         enable_gate_halt(5);
     }
 
     enable_gate_pulse(6);
+    ret = usb_transfer_init();
+    if (ret < 0) {
+        enable_gate_halt(6);
+    }
+
+    enable_gate_pulse(7);
     dev_desc = (void *)usb_get_device_descriptor();
     if (dev_desc->bDescriptorType != USB_DESC_DEVICE || dev_desc->bMaxPacketSize0 == 0) {
-        enable_gate_halt(6);
+        enable_gate_halt(7);
     }
 
     ep0_cfg.ep_mps = dev_desc->bMaxPacketSize0;
@@ -312,37 +319,37 @@ static int f22_debug_probe_usb_enable_gate(void)
     ep0_cfg.ep_addr = USB_CONTROL_EP_OUT;
     ret = usb_dc_ep_configure(&ep0_cfg);
     if (ret < 0) {
-        enable_gate_halt(6);
-    }
-
-    enable_gate_pulse(7);
-    ep0_cfg.ep_addr = USB_CONTROL_EP_IN;
-    ret = usb_dc_ep_configure(&ep0_cfg);
-    if (ret < 0) {
         enable_gate_halt(7);
     }
 
     enable_gate_pulse(8);
-    ret = usb_dc_ep_set_callback(USB_CONTROL_EP_OUT, enable_gate_ep_cb);
-    if (ret < 0) {
-        enable_gate_halt(8);
-    }
-    ret = usb_dc_ep_set_callback(USB_CONTROL_EP_IN, enable_gate_ep_cb);
+    ep0_cfg.ep_addr = USB_CONTROL_EP_IN;
+    ret = usb_dc_ep_configure(&ep0_cfg);
     if (ret < 0) {
         enable_gate_halt(8);
     }
 
     enable_gate_pulse(9);
-    ret = usb_dc_ep_enable(USB_CONTROL_EP_OUT);
+    ret = usb_dc_ep_set_callback(USB_CONTROL_EP_OUT, enable_gate_ep_cb);
     if (ret < 0) {
         enable_gate_halt(9);
     }
-    ret = usb_dc_ep_enable(USB_CONTROL_EP_IN);
+    ret = usb_dc_ep_set_callback(USB_CONTROL_EP_IN, enable_gate_ep_cb);
     if (ret < 0) {
         enable_gate_halt(9);
     }
 
     enable_gate_pulse(10);
+    ret = usb_dc_ep_enable(USB_CONTROL_EP_OUT);
+    if (ret < 0) {
+        enable_gate_halt(10);
+    }
+    ret = usb_dc_ep_enable(USB_CONTROL_EP_IN);
+    if (ret < 0) {
+        enable_gate_halt(10);
+    }
+
+    enable_gate_pulse(11);
     set_usb_pattern(USB_PROBE_PATTERN_AFTER_ENABLE);
     k_timer_start(&usb_state_timer, K_NO_WAIT, K_MSEC(150));
 

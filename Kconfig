@@ -43,6 +43,15 @@ config F22_DEBUG_PROBE_USB_INIT_BRACKET
       after it. Used with a GPIO hog and application blink probe to determine
       whether boot stops inside the RP Pico USB controller init.
 
+config F22_DEBUG_PROBE_USB_INIT_LADDER
+    bool "Ladder of led0 pulse groups at increasing init priorities"
+    depends on GPIO && USB_DEVICE_STACK
+    help
+      Registers SYS_INIT hooks at multiple POST_KERNEL and APPLICATION
+      priorities. Each hook pulses led0 N times and leaves it on, where N
+      matches the priority step. The last pulse group observed before the LED
+      goes solid identifies the last priority reached before boot stalls.
+
 endif
 
 endmenu

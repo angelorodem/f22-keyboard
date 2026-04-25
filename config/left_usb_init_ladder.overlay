@@ -1,0 +1,9 @@
+/ {
+    wired_split {
+        status = "disabled";
+    };
+
+    indicators {
+        status = "disabled";
+    };
+};

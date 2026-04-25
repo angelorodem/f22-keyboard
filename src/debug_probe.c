@@ -158,6 +158,48 @@ SYS_INIT(f22_debug_probe_pre_usb_init, POST_KERNEL, 49);
 SYS_INIT(f22_debug_probe_post_usb_init, POST_KERNEL, 51);
 #endif
 
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_INIT_LADDER)
+static void ladder_pulse(int n)
+{
+    /* Brief OFF/ON pulses so each group is countable, then a long ON hold
+     * so successive priority groups are visually separated. The LED is
+     * left ON between groups; if boot stalls, the LED stays solid ON and
+     * the last group of pulses observed identifies the last priority that
+     * ran to completion.
+     */
+    for (int i = 0; i < n; i++) {
+        (void)gpio_pin_set_dt(&debug_led, 0);
+        k_msleep(120);
+        (void)gpio_pin_set_dt(&debug_led, 1);
+        k_msleep(120);
+    }
+    k_msleep(900);
+}
+
+#define F22_LADDER_STEP(name, level, prio, count)                  \
+    static int f22_ladder_##name(void)                             \
+    {                                                              \
+        int ret = configure_debug_led();                           \
+        if (ret != 0) {                                            \
+            return ret;                                            \
+        }                                                          \
+        (void)gpio_pin_set_dt(&debug_led, 1);                      \
+        ladder_pulse(count);                                       \
+        return 0;                                                  \
+    }                                                              \
+    SYS_INIT(f22_ladder_##name, level, prio)
+
+F22_LADDER_STEP(pk_52,  POST_KERNEL, 52, 1);
+F22_LADDER_STEP(pk_60,  POST_KERNEL, 60, 2);
+F22_LADDER_STEP(pk_70,  POST_KERNEL, 70, 3);
+F22_LADDER_STEP(pk_80,  POST_KERNEL, 80, 4);
+F22_LADDER_STEP(pk_90,  POST_KERNEL, 90, 5);
+F22_LADDER_STEP(pk_99,  POST_KERNEL, 99, 6);
+F22_LADDER_STEP(app_01, APPLICATION,  1, 7);
+F22_LADDER_STEP(app_50, APPLICATION, 50, 8);
+F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
+#endif
+
 #if defined(CONFIG_F22_DEBUG_PROBE_USB_RAW)
 #define USB_RAW_THREAD_STACK 1024
 #define USB_RAW_THREAD_PRIO 7

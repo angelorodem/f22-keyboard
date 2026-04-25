@@ -31,6 +31,10 @@ include:
     cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_init_ladder.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_init_ladder.conf
 
   - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_usb_app_ladder
+    cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_app_ladder.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_app_ladder.conf
+
+  - board: rp2354_split_left/rp2350b/m33/zmk
     artifact-name: rp2354_split_left_usb_state
     cmake-args: -DEXTRA_DTC_OVERLAY_FILE=$PWD/config/left_usb_state.overlay -DEXTRA_CONF_FILE=$PWD/config/left_usb_state.conf
 

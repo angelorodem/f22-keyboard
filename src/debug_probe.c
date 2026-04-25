@@ -158,7 +158,8 @@ SYS_INIT(f22_debug_probe_pre_usb_init, POST_KERNEL, 49);
 SYS_INIT(f22_debug_probe_post_usb_init, POST_KERNEL, 51);
 #endif
 
-#if defined(CONFIG_F22_DEBUG_PROBE_USB_INIT_LADDER)
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_INIT_LADDER) || \
+    defined(CONFIG_F22_DEBUG_PROBE_USB_APP_LADDER)
 static void ladder_pulse(int n)
 {
     /* Brief OFF/ON pulses so each group is countable, then a long ON hold
@@ -188,7 +189,9 @@ static void ladder_pulse(int n)
         return 0;                                                  \
     }                                                              \
     SYS_INIT(f22_ladder_##name, level, prio)
+#endif
 
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_INIT_LADDER)
 F22_LADDER_STEP(pk_52,  POST_KERNEL, 52, 1);
 F22_LADDER_STEP(pk_60,  POST_KERNEL, 60, 2);
 F22_LADDER_STEP(pk_70,  POST_KERNEL, 70, 3);
@@ -197,6 +200,18 @@ F22_LADDER_STEP(pk_90,  POST_KERNEL, 90, 5);
 F22_LADDER_STEP(pk_99,  POST_KERNEL, 99, 6);
 F22_LADDER_STEP(app_01, APPLICATION,  1, 7);
 F22_LADDER_STEP(app_50, APPLICATION, 50, 8);
+F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
+#endif
+
+#if defined(CONFIG_F22_DEBUG_PROBE_USB_APP_LADDER)
+F22_LADDER_STEP(app_51, APPLICATION, 51, 1);
+F22_LADDER_STEP(app_80, APPLICATION, 80, 2);
+F22_LADDER_STEP(app_89, APPLICATION, 89, 3);
+F22_LADDER_STEP(app_91, APPLICATION, 91, 4);
+F22_LADDER_STEP(app_94, APPLICATION, 94, 5);
+F22_LADDER_STEP(app_95, APPLICATION, 95, 6);
+F22_LADDER_STEP(app_96, APPLICATION, 96, 7);
+F22_LADDER_STEP(app_97, APPLICATION, 97, 8);
 F22_LADDER_STEP(app_98, APPLICATION, 98, 9);
 #endif
 

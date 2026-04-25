@@ -52,6 +52,14 @@ config F22_DEBUG_PROBE_USB_INIT_LADDER
       matches the priority step. The last pulse group observed before the LED
       goes solid identifies the last priority reached before boot stalls.
 
+config F22_DEBUG_PROBE_USB_APP_LADDER
+    bool "Narrow led0 pulse ladder for application init priorities"
+    depends on GPIO && USB_DEVICE_STACK
+    help
+      Registers SYS_INIT hooks after APPLICATION priority 50 and around the
+      default application init priority. Used after the broad ladder shows boot
+      reaches APPLICATION priority 50 but stalls before late application init.
+
 endif
 
 endmenu

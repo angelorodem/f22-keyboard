@@ -3,6 +3,10 @@ include:
     artifact-name: rp2354_split_left
     snippet: rp2-boot-mode-retention
 
+  - board: rp2354_split_left/rp2350b/m33/zmk
+    artifact-name: rp2354_split_left_usb_logging
+    snippet: zmk-usb-logging
+
   - board: rp2354_split_right/rp2350b/m33/zmk
     artifact-name: rp2354_split_right
     snippet: rp2-boot-mode-retention

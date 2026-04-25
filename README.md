@@ -43,6 +43,8 @@ GitHub Actions builds both UF2 files:
 
 The build matrix is in [build.yaml](build.yaml). The firmware artifact is named `firmware`.
 
+For USB bring-up debugging, GitHub Actions also builds a `rp2354_split_left_usb_logging` UF2 that exposes a USB CDC ACM log port on the left half.
+
 ## Editing The Keymap
 
 The default keymap is in [config/rp2354_split.keymap](config/rp2354_split.keymap). It keeps the Advantage 360 logical layout and layer structure, with Kinesis-specific RGB, BLE, backlight, battery, and Studio bindings replaced by inert bindings for a plain RP2354 wired split build.
@@ -56,7 +58,7 @@ Use [Nick Coutsos's ZMK keymap editor](https://nickcoutsos.github.io/keymap-edit
 
 ## Caps Lock LED
 
-GPIO31 is configured as a HID Caps Lock indicator. When the host reports Caps Lock as active, the GPIO31 LED turns on. When Caps Lock is inactive, it turns off. HID indicator state is also forwarded to the wired split peripheral, so the right half can mirror the indicator if it has the same LED wiring.
+GPIO31 is configured as a HID Caps Lock indicator on the left half. When the host reports Caps Lock as active, the GPIO31 LED turns on. When Caps Lock is inactive, it turns off.
 
 ## Flashing
 
@@ -71,6 +73,13 @@ ZMK cannot flash the passive half over TRRS/UART. Flash both MCUs manually:
 7. Plug USB into the left half.
 
 Do not connect or disconnect the split cable while either half is powered.
+
+For first bring-up and USB debugging:
+
+1. Flash `rp2354_split_left_usb_logging.uf2` to the left half.
+2. Leave the right half disconnected for the first USB test.
+3. Plug USB into the left half and check Windows Device Manager for either a new keyboard/HID device or a new USB serial device.
+4. If the left half enumerates, flash the normal left UF2 again, then flash the right UF2 and test the full split with the UART cable attached before power-up.
 
 ## Local Build
 

@@ -13,3 +13,5 @@ bootloader/
 *.elf
 *.map
 *.log
+
+.agents/

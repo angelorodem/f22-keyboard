@@ -1,6 +1,7 @@
 zephyr_library()
 zephyr_library_sources_ifdef(CONFIG_USB_DEVICE_STACK src/usb_serial_number.c)
 if(CONFIG_ZMK_SPLIT_PERIPHERAL_HID_INDICATORS AND NOT CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
+  zephyr_include_directories(${APPLICATION_SOURCE_DIR}/include)
   zephyr_library_sources(src/split_peripheral_hid_indicator_led.c)
 endif()
 zephyr_library_sources_ifdef(CONFIG_F22_DEBUG_PROBE src/debug_probe.c)

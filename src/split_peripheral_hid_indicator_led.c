@@ -6,9 +6,10 @@
 #include <zephyr/init.h>
 #include <zephyr/sys/util.h>
 
-#include <dt-bindings/zmk/hid_indicators.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/hid_indicators_changed.h>
+
+#define F22_HID_INDICATOR_CAPS_LOCK BIT(1)
 
 #if IS_ENABLED(CONFIG_ZMK_SPLIT) && !IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL) && \
     DT_NODE_HAS_STATUS(DT_ALIAS(led0), okay)
@@ -32,7 +33,7 @@ static int split_peripheral_hid_indicator_led_listener(const zmk_event_t *event)
         return ZMK_EV_EVENT_BUBBLE;
     }
 
-    gpio_pin_set_dt(&caps_lock_led, (indicators->indicators & HID_INDICATOR_CAPS_LOCK) != 0);
+    gpio_pin_set_dt(&caps_lock_led, (indicators->indicators & F22_HID_INDICATOR_CAPS_LOCK) != 0);
     return ZMK_EV_EVENT_BUBBLE;
 }
 

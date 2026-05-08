@@ -61,7 +61,7 @@ Use [Nick Coutsos's ZMK keymap editor](https://nickcoutsos.github.io/keymap-edit
 
 ## Caps Lock LED
 
-GPIO31 is configured as a HID Caps Lock indicator on the left half. When the host reports Caps Lock as active, the GPIO31 LED turns on. When Caps Lock is inactive, it turns off.
+GPIO31 is configured as a HID Caps Lock indicator on both halves. The left half uses ZMK's host-facing HID indicator LED support, and the right half follows the propagated split HID indicator state from the central side. When the host reports Caps Lock as active, the GPIO31 LEDs turn on. When Caps Lock is inactive, they turn off.
 
 ## Flashing
 
